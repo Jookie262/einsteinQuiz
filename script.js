@@ -1,29 +1,29 @@
-const score_Text = document.getElementById("score");
-const question_Text = document.getElementById("question");
-const option_List = document.getElementById("choose-list");
-const next_Button = document.querySelector("button");
-const currentQuestion_Container = document.querySelector("footer");
-let text_Count = 0;
-let question_Count = 1;
-score_Text.innerHTML = "<h2>Score: 0</h2>";
-const question_List = [
+const score_Container = document.getElementById("score");
+const question_Container = document.getElementById("question");
+const option_Container = document.getElementById("choose-list");
+const questionNumber_Container = document.querySelector("footer");
+const nextButton = document.querySelector("button");
+const countDown = document.getElementById("timerShow");
+let questionNumber = 1;
+let questionIndex = 0;
+const dataList = [
   {
     number: 1,
     answer: "March 14, 1879",
     question: "What is the year of Albert Einstein was born?",
-    options: ["March 14, 1879", "November 14, 1829", "February 16, 1789"],
+    options: ["March 14, 1879", "February 16, 1789", "November 14, 1829"],
   },
   {
     number: 2,
     answer: "Special Relativity",
     question: "What theory did Albert Einstein develop?",
-    options: ["Radioactivity", "Universal Gravitation", "Special Relativity"],
+    options: ["Special Relativity", "Universal Gravitation", "Radioactivity"],
   },
   {
     number: 3,
     answer: "12",
     question: "He is __ years old when he discovered a book of geometry.",
-    options: ["9", "12", "14"],
+    options: ["12", "14", "16"],
   },
   {
     number: 4,
@@ -34,46 +34,71 @@ const question_List = [
   {
     number: 5,
     answer: "Vacation",
-    question:
-      "Where Einstein was when he heard the news about the atomic bomb?",
+    question: "Where Einstein was when he heard the news that an atomic bomb?",
     options: ["Office", "Vacation", "Meeting"],
   },
 ];
-next_Button.onclick = () => {
-  if (question_Count < question_List.length) {
-    text_Count++;
-    question_Count++;
-    questionShow(text_Count, question_Count);
-    questionCounter(question_Count);
+nextButton.onclick = () => {
+  if (questionIndex < dataList.length - 1) {
+    questionIndex++;
+    questionNumber++;
+    showQuestion(questionIndex);
+    questionCounter(questionNumber);
+    startTimer(30);
   } else {
     console.log("Quiz completed");
   }
 };
-let questionShow = (index) => {
-  let question_Popup =
-    "<h2>" +
-    question_List[index].number +
-    ". " +
-    question_List[index].question +
-    "</h2>";
-  let options_Text =
-    "<div class='allOption'>" +
-    question_List[index].options[0] +
+let showQuestion = (questionIndex) => {
+  const options_Text =
+    "<div class='options'>" +
+    dataList[questionIndex].options[0] +
     "</div>" +
-    "<div class='allOption'>" +
-    question_List[index].options[1] +
+    "<div class='options'>" +
+    dataList[questionIndex].options[1] +
     "</div>" +
-    "<div class='allOption'>" +
-    question_List[index].options[2] +
+    "<div class='options'>" +
+    dataList[questionIndex].options[2] +
     "</div>";
-  question_Text.innerHTML = question_Popup;
-  option_List.innerHTML = options_Text;
-};
-let questionCounter = (question_Count) => {
-  let question_Calculate =
-    "<p>" + question_Count + " out of " + question_List.length + "</p>";
-  currentQuestion_Container.innerHTML = question_Calculate;
+  question_Container.innerHTML =
+    "<h2>" +
+    dataList[questionIndex].number +
+    ". " +
+    dataList[questionIndex].question +
+    "</h2>";
+  option_Container.innerHTML = options_Text;
+  document.querySelectorAll(".options").forEach((allOptions) => {
+    allOptions.setAttribute("onclick", "optionSelected(this)");
+  });
 };
 
-questionCounter(question_Count);
-questionShow(text_Count);
+let optionSelected = (answer) => {
+  const userAnswer = answer.textContent;
+  const correctAnswer = dataList[questionIndex].answer;
+  const getAllOptions = option_Container.children.length;
+  if (userAnswer == correctAnswer) {
+    console.log(userAnswer + " is correct");
+    answer.classList.add("correctAnswer");
+  } else {
+    answer.classList.add("wrongAnswer");
+    console.log(userAnswer + " is wrong");
+    for (let index = 0; index < getAllOptions; index++) {
+      if (option_Container.children[index].textContent == correctAnswer) {
+        option_Container.children[index].setAttribute(
+          "class",
+          "options correctAnswer"
+        );
+      }
+    }
+  }
+  for (let c = 0; c < getAllOptions; c++) {
+    option_Container.children[c].classList.add("disabled");
+  }
+};
+let questionCounter = (questionNumber) => {
+  questionNumber_Container.innerHTML =
+    "<p>" + questionNumber + " out of " + dataList.length + "</p>";
+};
+
+questionCounter(questionNumber);
+showQuestion(questionIndex);
