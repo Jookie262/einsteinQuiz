@@ -4,67 +4,64 @@ const option_Container = document.getElementById("choose-list");
 const questionNumber_Container = document.querySelector("footer");
 const nextButton = document.querySelector("button");
 const countDown = document.getElementById("timerShow");
+let txt_score = document.getElementById("txt-score");
+let score = 0;
 let questionNumber = 1;
 let questionIndex = 0;
-const dataList = [
-  {
-    number: 1,
-    answer: "March 14, 1879",
-    question: "What is the year of Albert Einstein was born?",
-    options: ["March 14, 1879", "February 16, 1789", "November 14, 1829"],
-  },
-  {
-    number: 2,
-    answer: "Special Relativity",
-    question: "What theory did Albert Einstein develop?",
-    options: ["Special Relativity", "Universal Gravitation", "Radioactivity"],
-  },
-  {
-    number: 3,
-    answer: "12",
-    question: "He is __ years old when he discovered a book of geometry.",
-    options: ["12", "14", "16"],
-  },
-  {
-    number: 4,
-    answer: "1902",
-    question: "He was stateless until ____.",
-    options: ["1899", "1982", "1902"],
-  },
-  {
-    number: 5,
-    answer: "Vacation",
-    question: "Where Einstein was when he heard the news that an atomic bomb?",
-    options: ["Office", "Vacation", "Meeting"],
-  },
-];
+
+let shuffleArray = (arr) => {
+  return arr.sort(() => 0.5 - Math.random())
+}
+
+let questions_shuffle = shuffleArray(dataList)
+
+
+let startTimer = function (max_time, element){
+  let timer = setInterval(() => {
+    element.innerHTML = max_time--;
+    if(max_time == -1){
+      
+      //Code here if the timer is finish
+      alert("Lose")
+      clearInterval(timer)
+    }
+  },1000)
+}
+
+window.onload = () => {
+  startTimer(30, countDown);
+}
+
 nextButton.onclick = () => {
   if (questionIndex < dataList.length - 1) {
     questionIndex++;
     questionNumber++;
     showQuestion(questionIndex);
     questionCounter(questionNumber);
-    startTimer(30);
+   
   } else {
     console.log("Quiz completed");
   }
 };
+
+
 let showQuestion = (questionIndex) => {
+  let options_shuffle = shuffleArray(dataList[questionIndex].options);
   const options_Text =
     "<div class='options'>" +
-    dataList[questionIndex].options[0] +
+    options_shuffle[0] +
     "</div>" +
     "<div class='options'>" +
-    dataList[questionIndex].options[1] +
+    options_shuffle[1] +
     "</div>" +
     "<div class='options'>" +
-    dataList[questionIndex].options[2] +
+    options_shuffle[2] +
     "</div>";
   question_Container.innerHTML =
     "<h2>" +
-    dataList[questionIndex].number +
+    (questionIndex + 1) + 
     ". " +
-    dataList[questionIndex].question +
+    questions_shuffle[questionIndex].question +
     "</h2>";
   option_Container.innerHTML = options_Text;
   document.querySelectorAll(".options").forEach((allOptions) => {
@@ -77,6 +74,8 @@ let optionSelected = (answer) => {
   const correctAnswer = dataList[questionIndex].answer;
   const getAllOptions = option_Container.children.length;
   if (userAnswer == correctAnswer) {
+    score++;
+    txt_score.innerHTML = score;
     console.log(userAnswer + " is correct");
     answer.classList.add("correctAnswer");
   } else {
